@@ -29,8 +29,7 @@
     dwmapi.lib
     windowsapp.lib
     ```
-4.  **DPI 感知**：在`项目属性 -> 清单工具 -> 输入和输出 -> DPI 感知`中选择**"Per Monitor High DPI Aware"**（或者代码中已通过`SetProcessDpiAwarenessContext`设置，此处可跳过）。
-5.  **编译**: 选择 **Release** 和 **x64** 模式进行编译。
+4.  **编译**: 选择 **Release** 和 **x64** 模式进行编译。
 
 ## ⚙️ 参数配置 (配置)
 
