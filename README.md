@@ -1,5 +1,5 @@
 ***
-# 近视模拟器（C++ / DirectX 11 高性能）
+# 近视散焦模拟器（C++ / DirectX 11 高性能）
 **近视散焦模拟器 - C++ 高性能重构版**
 本项目是将原本基于 Python(https://github.com/zcf0508/myopic_defocus) 的近视散焦模拟工具重构为 C++ 版本。通过使用 **DirectX 11** 和 **DXGI Desktop Duplication API**，实现了极低的延迟和极高的性能，解决了 Python 版本在高帧率屏幕下的卡顿和高 CPU 占用问题。
 ##✨ 核心特性 (Features)
