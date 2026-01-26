@@ -4,8 +4,8 @@
 本项目是将原本基于 Python(https://github.com/zcf0508/myopic_defocus) 的近视散焦模拟工具重构为 C++ 版本。通过使用 **DirectX 11** 和 **DXGI Desktop Duplication API**，实现了极低的延迟和极高的性能，解决了 Python 版本在高帧率屏幕下的卡顿和高 CPU 占用问题。
 ##✨ 核心特性 (Features)
 
-*   **🚀 极致性能**: 采用全 GPU 管线（Zero-Copy）。截屏、模糊计算、渲染全流程在显存内完成，CPU 占用率 < 1%。
-*   **🖥️ 桌面复制 API**：使用 Windows 最底层的 `Desktop Duplication API`，支持 HDR 和高色深（10bit）格式，兼容 AMD/NVIDIA 独显。
+*   **🚀 极致性能**: 采用全 GPU 管线（Zero-Copy）。截屏、模糊计算、渲染全流程在显存内完成，CPU 占用率低。
+*   **🖥️ 桌面复制 API**：使用 Windows 的 `Desktop Duplication API`，支持 HDR 和高色深（10bit）格式，兼容 AMD/NVIDIA 独显。
 *   **👁️ 物理光学模拟**: 模拟**纵向色差 (Longitudinal Chromatic Aberration, LCA)**。不同于普通的高斯模糊，本程序对蓝光和绿光通道分离计算模糊半径，以模拟近视防控中的离焦效果。
 *   **🖱️ 无干扰叠加**: 窗口全透明、鼠标点击穿透、对截图软件隐藏（防止无限镜像）。
 *   **⚡ 节能优化**：内置帧率限制器（默认 30 FPS），在保证视觉效果的同时最大化降低显卡功耗。
@@ -106,8 +106,7 @@
 Python项目：https://github.com/zcf0508/myopic_defocus
 
 ## ⚠️ 免责声明 (Disclaimer)
-
 本软件仅供学习和实验用途。虽然其基于近视离焦原理编写，但**不构成任何医疗建议**。使用过程中如感到眼部不适（如头晕、恶心），请立即停止使用。
-提示：本项目大量使用人工智能代码构建技术。
-
+/n提示：本项目大量使用人工智能代码构建技术。
+/n本项目离焦参数来源于python项目 python来源于refractify.io 如有参数错误请提issues
 *Created by lerrenp*
