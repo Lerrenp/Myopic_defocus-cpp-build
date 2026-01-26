@@ -77,9 +77,9 @@
 
 > **注意**：如果您将强度降为 0，程序将显示原始清晰图像，此时仅相当于一个透明层。
 
-> **关于退出**：请使用任务管理器（Taskmgr）直接结束进程。
+> **关于退出**：也可以使用任务管理器（Taskmgr）直接结束进程或自行定义其他vk虚拟键码。
 
-## 🔧 常见问题 (常见问题解决)
+## 🔧 常见问题 (常见问题解决) 
 
 1.  **屏幕全黑或全蓝？**
     *   这是因为没有抓取到屏幕内容。请尝试将全屏独占的游戏切换为“无边框窗口 (Borderless Window)”模式。
@@ -88,7 +88,7 @@
 2.  **只有左上角有画面？**
     *   DPI 缩放问题。请确保代码中保留了 `SetProcessDpiAwarenessContext` 调用，或在编译设置中开启 DPI 感知。
 
-3.  **报错 "CopyResource ... Formats not the same"？**
+#报错 "CopyResource ... Formats not the same"？**
     *   已在代码中修复。这是由于开启了 HDR 或使用了 10bit 色深。程序会自动检测格式并重建纹理。
 
 4.  **画面没有模糊效果？**
@@ -111,4 +111,4 @@ Python项目：https://github.com/zcf0508/myopic_defocus
 * 提示：本项目大量使用人工智能代码构建技术。
 * 本项目离焦参数来源于python项目 python原项目则来源于refractify.io 如有参数错误请提issues
 
-*Created by lerrenp*
+Created by lerrenp*
