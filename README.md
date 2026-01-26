@@ -108,5 +108,5 @@ Python项目：https://github.com/zcf0508/myopic_defocus
 ## ⚠️ 免责声明 (Disclaimer)
 * 本软件仅供学习和实验用途。虽然其基于近视离焦原理编写，但**不构成任何医疗建议**。使用过程中如感到眼部不适（如头晕、恶心），请立即停止使用。
 * 提示：本项目大量使用人工智能代码构建技术。
-* 本项目离焦参数来源于python项目 python来源于refractify.io 如有参数错误请提issues
+* 本项目离焦参数来源于python项目 python原项目则来源于refractify.io 如有参数错误请提issues
 *Created by lerrenp*
