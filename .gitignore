@@ -1,0 +1,95 @@
+# ==========================================
+# Visual Studio / MSBuild 产物
+# ==========================================
+.vs/
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+[Dd]ebug-*/
+[Rr]elease-*/
+x64/
+x86/
+Win32/
+ARM/
+ARM64/
+*.user
+*.suo
+*.userprefs
+*.sln.docstates
+*.sln.idegraph
+*.sln.ide
+*.ncb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.opendb
+ipch/
+*.aps
+*.pch
+*.vspscc
+*.vssscc
+*.tlog
+*.lastbuildstate
+*.unsuccessfulbuild
+*.idb
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.log
+*.exp
+*.ilk
+*.iobj
+
+# ==========================================
+# C++ 编译产物
+# ==========================================
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dll
+*.exe
+*.dylib
+
+# ==========================================
+# Windows / 系统文件
+# ==========================================
+Thumbs.db
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# ==========================================
+# IDE / 编辑器
+# ==========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.bak
+
+# ==========================================
+# 构建工具
+# ==========================================
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
+_deps
+Testing/
+compile_commands.json
+
+# ==========================================
+# OS
+# ==========================================
+.DS_Store
+.directory
