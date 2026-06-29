@@ -1,0 +1,8 @@
+﻿<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="MyopicDefocus/MyopicDefocus.vcxproj" Id="b0b0b0b0-1234-5678-9abc-def012345678" />
+  <Project Path="MyopicDefocusConfig/MyopicDefocusConfig.vcxproj" Id="c2c2c2c2-1234-5678-9abc-def012345678" />
+  <Project Path="MyopicDefocusTests/MyopicDefocusTests.vcxproj" Id="a1a1a1a1-1234-5678-9abc-def012345678" />
+</Solution>
