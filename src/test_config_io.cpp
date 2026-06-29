@@ -3,7 +3,9 @@
 // 测试 JSON 序列化/反序列化往返一致性 + 默认值保留
 // ==========================================
 #include "config_io.h"
+#include "cli.h"          // cli::PrintUtf8 - Unicode 写到控制台, 不动 codepage
 #include <cstdio>
+#include <cstdarg>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
@@ -14,15 +16,26 @@ using namespace config_io;
 extern int g_passed;
 extern int g_failed;
 
+// 输出助手: 与 test_optical_model.cpp::out 等价, 用 cli::PrintUtf8 (WriteConsoleW)
+// 解决 cmd.exe 默认 GBK (CP936) 下中文 printf 乱码; 不修改控制台 codepage
+static void out(const char* fmt, ...) {
+    char buf[2048];
+    va_list args;
+    va_start(args, fmt);
+    std::vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+    cli::PrintUtf8(buf);
+}
+
 #define EXPECT_EQ_INT(actual, expected) \
     do { \
         int _a = (actual), _e = (expected); \
         if (_a == _e) { \
             ++g_passed; \
-            std::printf("  [PASS] %s == %d\n", #actual, _e); \
+            out("  [PASS] %s == %d\n", #actual, _e); \
         } else { \
             ++g_failed; \
-            std::printf("  [FAIL] %s: got %d expected %d\n", #actual, _a, _e); \
+            out("  [FAIL] %s: got %d expected %d\n", #actual, _a, _e); \
         } \
     } while(0)
 
@@ -31,15 +44,15 @@ extern int g_failed;
         float _a = (actual), _e = (expected); \
         if (std::fabs(_a - _e) <= (tol)) { \
             ++g_passed; \
-            std::printf("  [PASS] %s ~= %g (diff=%g)\n", #actual, _e, std::fabs(_a-_e)); \
+            out("  [PASS] %s ~= %g (diff=%g)\n", #actual, _e, std::fabs(_a-_e)); \
         } else { \
             ++g_failed; \
-            std::printf("  [FAIL] %s: got %g expected %g (diff=%g > %g)\n", \
+            out("  [FAIL] %s: got %g expected %g (diff=%g > %g)\n", \
                 #actual, _a, _e, std::fabs(_a-_e), (float)(tol)); \
         } \
     } while(0)
 
-#define CASE(name) std::printf("\n[TEST] %s\n", name)
+#define CASE(name) out("\n[TEST] %s\n", name)
 
 // 往返一致性: serialize -> deserialize 应该得到完全相同的值
 static void test_roundtrip() {
@@ -54,7 +67,7 @@ static void test_roundtrip() {
     cfg.targetFps = 60;
 
     std::string json = ToJsonString(cfg);
-    std::printf("  JSON output:\n%s\n", json.c_str());
+    out("  JSON output:\n%s\n", json.c_str());
 
     Config cfg2;
     FromJsonString(json, cfg2);
@@ -97,10 +110,10 @@ static void test_auto_resolution_serializes_null() {
     if (json.find("\"resX\": null") != std::string::npos &&
         json.find("\"resY\": null") != std::string::npos) {
         ++g_passed;
-        std::printf("  [PASS] resX/resY serialized as null\n");
+        out("  [PASS] resX/resY serialized as null\n");
     } else {
         ++g_failed;
-        std::printf("  [FAIL] resX/resY should be null:\n%s\n", json.c_str());
+        out("  [FAIL] resX/resY should be null:\n%s\n", json.c_str());
     }
 }
 
@@ -156,7 +169,7 @@ static void test_missing_file() {
 }
 
 int RunConfigIoTests() {
-    std::printf("  ---- config_io 简易插桩 ----\n");
+    out("  ---- config_io 简易插桩 ----\n");
     std::fflush(stdout);
 
     test_roundtrip();

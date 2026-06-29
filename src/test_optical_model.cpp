@@ -4,15 +4,11 @@
 // ==========================================
 #include "optical_model.h"
 #include "config.h"
+#include "cli.h"          // cli::PrintUtf8 - Unicode 写到控制台, 不动 codepage
 #include <cstdio>
+#include <cstdarg>
 #include <cmath>
 #include <cstdlib>
-
-// 前置声明 SetConsoleOutputCP, 避免引入 <windows.h> 的宏污染
-// (<windows.h> 会定义 near/far 宏, 与下方测试代码的 near/far 变量名冲突)
-extern "C" int __stdcall SetConsoleOutputCP(unsigned int wCodePageID);
-// CP_UTF8 = 65001 (windows.h 中定义; 此处硬编码以避免依赖该头文件)
-static constexpr unsigned int kCP_UTF8 = 65001;
 
 // 全局测试计数器,跨翻译单元共享 (test_config_io.cpp 也写入)
 int g_passed = 0;
@@ -20,6 +16,18 @@ int g_failed = 0;
 
 // 由 test_config_io.cpp 提供
 int RunConfigIoTests();
+
+// 输出助手: 格式化为 UTF-8 字符串, 然后用 WriteConsoleW 写宽字符
+// 解决 cmd.exe 默认 GBK (CP936) 下中文 printf 输出乱码的问题
+// 关键: 不修改控制台 codepage (与 cli::PrintUtf8 内部一致, 用 WriteConsoleW 绕过)
+static void out(const char* fmt, ...) {
+    char buf[2048];
+    va_list args;
+    va_start(args, fmt);
+    std::vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+    cli::PrintUtf8(buf);
+}
 
 // ----------- 断言宏 -----------
 #define EXPECT_NEAR(actual, expected, tol) \
@@ -29,11 +37,11 @@ int RunConfigIoTests();
         float _d = std::fabs(_a - _e); \
         if (_d <= (tol)) { \
             ++g_passed; \
-            std::printf("  [PASS] %-32s  got=%.4f  expected=%.4f  diff=%.5f\n", \
+            out("  [PASS] %-32s  got=%.4f  expected=%.4f  diff=%.5f\n", \
                 #actual, _a, _e, _d); \
         } else { \
             ++g_failed; \
-            std::printf("  [FAIL] %-32s  got=%.4f  expected=%.4f  diff=%.5f > tol=%.4f\n", \
+            out("  [FAIL] %-32s  got=%.4f  expected=%.4f  diff=%.5f > tol=%.4f\n", \
                 #actual, _a, _e, _d, (float)(tol)); \
         } \
     } while(0)
@@ -42,14 +50,14 @@ int RunConfigIoTests();
     do { \
         if (cond) { \
             ++g_passed; \
-            std::printf("  [PASS] %s\n", #cond); \
+            out("  [PASS] %s\n", #cond); \
         } else { \
             ++g_failed; \
-            std::printf("  [FAIL] %s\n", #cond); \
+            out("  [FAIL] %s\n", #cond); \
         } \
     } while(0)
 
-#define CASE(name) std::printf("\n[TEST] %s\n", name)
+#define CASE(name) out("\n[TEST] %s\n", name)
 
 // ----------- 测试用例 -----------
 
@@ -173,15 +181,11 @@ static void test_blue_always_more_blur() {
 }
 
 int main() {
-    // 让 cmd.exe (默认 GBK/CP936) 按 UTF-8 解释 printf 输出的中文字节
-    // 与 MyopicDefocusConfig.cpp::wmain 入口处理保持一致
-    SetConsoleOutputCP(kCP_UTF8);
+    out("============================================\n");
+    out("  MyopicDefocus 单测套件\n");
+    out("============================================\n");
 
-    std::printf("============================================\n");
-    std::printf("  MyopicDefocus 单测套件\n");
-    std::printf("============================================\n");
-
-    std::printf("\n>>>>>>>> Module 1: ComputeBlurRadii <<<<<<<<\n");
+    out("\n>>>>>>>> Module 1: ComputeBlurRadii <<<<<<<<\n");
     test_js_upstream_defaults();
     test_cpp_defaults();
     test_4k_resolution();
@@ -190,18 +194,18 @@ int main() {
     test_very_close_small_blur();
     test_blue_always_more_blur();
     int opticalPassed = g_passed, opticalFailed = g_failed;
-    std::printf("  [ComputeBlurRadii 阶段] passed=%d failed=%d\n", opticalPassed, opticalFailed);
+    out("  [ComputeBlurRadii 阶段] passed=%d failed=%d\n", opticalPassed, opticalFailed);
 
-    std::printf("\n>>>>>>>> Module 2: config_io <<<<<<<<\n");
+    out("\n>>>>>>>> Module 2: config_io <<<<<<<<\n");
     int ioPassed = g_passed, ioFailed = g_failed;
     RunConfigIoTests();
     ioPassed = g_passed - ioPassed;
     ioFailed = g_failed - ioFailed;
-    std::printf("  [config_io 阶段] passed=%d failed=%d\n", ioPassed, ioFailed);
+    out("  [config_io 阶段] passed=%d failed=%d\n", ioPassed, ioFailed);
 
-    std::printf("\n============================================\n");
-    std::printf("  总计: %d 通过, %d 失败\n", g_passed, g_failed);
-    std::printf("============================================\n");
+    out("\n============================================\n");
+    out("  总计: %d 通过, %d 失败\n", g_passed, g_failed);
+    out("============================================\n");
 
     return g_failed > 0 ? 1 : 0;
 }

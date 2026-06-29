@@ -88,6 +88,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\framework.h" />
     <ClInclude Include="..\src\targetver.h" />
+    <ClInclude Include="..\src\cli.h" />
     <ClInclude Include="..\src\config.h" />
     <ClInclude Include="..\src\config_io.h" />
     <ClInclude Include="..\src\optical_model.h" />
@@ -95,6 +96,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\test_optical_model.cpp" />
     <ClCompile Include="..\src\test_config_io.cpp" />
+    <ClCompile Include="..\src\cli.cpp" />
     <ClCompile Include="..\src\optical_model.cpp" />
     <ClCompile Include="..\src\config_io.cpp" />
   </ItemGroup>
