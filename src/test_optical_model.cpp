@@ -8,6 +8,12 @@
 #include <cmath>
 #include <cstdlib>
 
+// 前置声明 SetConsoleOutputCP, 避免引入 <windows.h> 的宏污染
+// (<windows.h> 会定义 near/far 宏, 与下方测试代码的 near/far 变量名冲突)
+extern "C" int __stdcall SetConsoleOutputCP(unsigned int wCodePageID);
+// CP_UTF8 = 65001 (windows.h 中定义; 此处硬编码以避免依赖该头文件)
+static constexpr unsigned int kCP_UTF8 = 65001;
+
 // 全局测试计数器,跨翻译单元共享 (test_config_io.cpp 也写入)
 int g_passed = 0;
 int g_failed = 0;
@@ -167,6 +173,10 @@ static void test_blue_always_more_blur() {
 }
 
 int main() {
+    // 让 cmd.exe (默认 GBK/CP936) 按 UTF-8 解释 printf 输出的中文字节
+    // 与 MyopicDefocusConfig.cpp::wmain 入口处理保持一致
+    SetConsoleOutputCP(kCP_UTF8);
+
     std::printf("============================================\n");
     std::printf("  MyopicDefocus 单测套件\n");
     std::printf("============================================\n");
