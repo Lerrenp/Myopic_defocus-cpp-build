@@ -52,9 +52,20 @@ void CaptureFrame() {
     DXGI_OUTDUPL_FRAME_INFO frameInfo;
     ComPtr<IDXGIResource> desktopResource;
 
-    HRESULT hr = g_duplication->AcquireNextFrame(0, &frameInfo, &desktopResource);
+    // 首帧：尚未抓到任何画面时给足等待时间，避免启动后长期黑屏；
+    // 之后桌面无更新时 AcquireNextFrame 返回 WAIT_TIMEOUT，直接复用上一帧画面。
+    UINT timeoutMs = g_capturedTexture ? 0 : 1000;
+    HRESULT hr = g_duplication->AcquireNextFrame(timeoutMs, &frameInfo, &desktopResource);
 
     if (SUCCEEDED(hr)) {
+        // 跳过不包含桌面更新的“空帧”（部分驱动/AMD 下会反复返回旧内容），防止拖影。
+        // 仅在已有有效画面时才跳过；首帧始终处理。
+        if (g_capturedTexture && frameInfo.AccumulatedFrames == 0 &&
+            frameInfo.LastMouseUpdateTime.QuadPart == 0) {
+            g_duplication->ReleaseFrame();
+            return;
+        }
+
         ComPtr<ID3D11Texture2D> tex;
         hr = desktopResource.As(&tex);
         if (SUCCEEDED(hr)) {
