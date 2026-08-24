@@ -57,6 +57,7 @@ bool InitD3D(HWND hwnd) {
     if (FAILED(hr)) {
         LogHr("dxgiAdapter->GetParent(IDXGIFactory2)", hr);
         return false;
+     
     }
 
     DXGI_SWAP_CHAIN_DESC1 scd = { 0 };
@@ -64,7 +65,9 @@ bool InitD3D(HWND hwnd) {
     scd.SampleDesc.Count = 1;
     scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     scd.BufferCount = 2;
-    scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+    // 窗口使用 WS_EX_LAYERED（点击穿透所必需）。翻转模型 (FLIP_DISCARD)
+    // 在分层窗口上 Present 会黑屏，必须用位块传输模型 (DISCARD)。
+    scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
     scd.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
 
     hr = dxgiFactory->CreateSwapChainForHwnd(g_d3dDevice.Get(), hwnd, &scd, nullptr, nullptr, &g_swapChain);
