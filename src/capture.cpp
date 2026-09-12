@@ -52,7 +52,9 @@ void CaptureFrame() {
     DXGI_OUTDUPL_FRAME_INFO frameInfo;
     ComPtr<IDXGIResource> desktopResource;
 
-    HRESULT hr = g_duplication->AcquireNextFrame(0, &frameInfo, &desktopResource);
+    // 首帧 (尚未创建捕获纹理) 等待桌面图像就绪, 之后维持非阻塞.
+    UINT timeoutMs = g_capturedTexture ? 0 : 1000;
+    HRESULT hr = g_duplication->AcquireNextFrame(timeoutMs, &frameInfo, &desktopResource);
 
     if (SUCCEEDED(hr)) {
         ComPtr<ID3D11Texture2D> tex;
