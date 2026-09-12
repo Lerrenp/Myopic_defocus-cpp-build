@@ -102,7 +102,19 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int) {
     }
 
     ResizeSwapChain();
-    SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE);
+    if (!SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE)) {
+        LogWin32("SetWindowDisplayAffinity", GetLastError());
+    } else {
+        DWORD affinity = 0;
+        if (GetWindowDisplayAffinity(hwnd, &affinity)) {
+            char buf[160];
+            sprintf_s(buf, "SetWindowDisplayAffinity ok, readback=0x%08lX (WDA_EXCLUDEFROMCAPTURE=0x%08lX)",
+                      affinity, (unsigned long)WDA_EXCLUDEFROMCAPTURE);
+            LogInfo(buf);
+        } else {
+            LogWin32("GetWindowDisplayAffinity", GetLastError());
+        }
+    }
 
     UpdateShaderParams();
 
