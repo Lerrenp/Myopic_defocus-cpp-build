@@ -25,7 +25,7 @@
 ### 一键构建 (MSBuild)
 
 ```powershell
-cd Myopic_defocus-cpp-build-main
+cd Myopic_defocus-cpp-build
 msbuild MyopicDefocus.slnx -p:Configuration=Release -p:Platform=x64
 ```
 
@@ -96,11 +96,11 @@ msbuild MyopicDefocus.slnx -p:Configuration=Release -p:Platform=x64
 # 1. 首次使用: 生成 config.json
 .\MyopicDefocusConfig.exe
 
-# 2. 启动滤镜 (全屏 overlay, Esc 退出)
+# 2. 启动滤镜 (全屏 overlay, Esc 或 Ctrl+Alt+M 退出)
 .\MyopicDefocus.exe
 ```
 
-滤镜启动后覆盖全屏，按 `Esc` 退出。焦点丢失时可用任务管理器结束进程。
+滤镜启动后覆盖全屏，按 `Esc` 退出；窗口不激活时可用全局热键 `Ctrl+Alt+M` 退出。
 
 ## 🛠️ 架构
 
@@ -117,7 +117,7 @@ src/
 ├── blur_shader.h                  # HLSL 着色器源码
 ├── capture.h / .cpp               # DXGI 桌面复制 (ComPtr)
 ├── renderer.h / .cpp              # D3D11 双 Pass 模糊管线
-├── log.h                          # LogHr / LogMsg
+├── log.h                          # LogHr / LogMsg / LogInfo / LogWin32
 └── third_party/nlohmann/json.hpp  # vendored 3.12.0
 ```
 
@@ -131,6 +131,7 @@ src/
 | 现象 | 原因 / 解决 |
 |---|---|
 | 屏幕全黑 / 全蓝 | 抓屏失败；将全屏独占游戏切到「无边框窗口」 |
+| AMD 显卡黑屏 | 分层窗口与 FLIP 交换链不兼容；已改用 DISCARD (BitBlt) 交换链 |
 | 只有左上角有画面 | DPI 缩放问题；确保 `SetProcessDpiAwarenessContext` 已调用 |
 | `CopyResource ... Formats not the same` | HDR / 10bit 色深；代码已自动重建纹理，如仍报错请关闭 HDR |
 | 画面没模糊 | 视距过远或屏幕 PPI 计算异常导致模糊半径 ≈ 0 |
@@ -141,7 +142,7 @@ src/
 - **C++20** / MSVC v145
 - **DirectX 11**（D3D11 + DXGI 1.2）
 - **HLSL** Pixel Shader 5.0（双 Pass 可分离高斯 + LCA）
-- **Win32 + DWM**（透明叠层窗口）
+- **Win32 分层窗口**（`WS_EX_LAYERED` + `SetLayeredWindowAttributes`，非 DWM 边框扩展）
 - **ComPtr RAII**（零裸 COM 指针）
 
 ## ⚠️ 免责声明
