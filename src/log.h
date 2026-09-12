@@ -12,14 +12,25 @@
 // 但 OutputDebugStringA 在 VS 调试器中实时可见。
 // Release 下可通过 DebugView (Sysinternals) 捕获。
 
-inline void LogHr(const char* context, HRESULT hr) {
-    char buf[256];
-    sprintf_s(buf, "[MyopicDefocus] %s failed: HR=0x%08X\n", context, hr);
-    OutputDebugStringA(buf);
-    fputs(buf, stderr);
-}
-
 inline void LogMsg(const char* msg) {
     OutputDebugStringA(msg);
     fputs(msg, stderr);
+}
+
+inline void LogHr(const char* context, HRESULT hr) {
+    char buf[256];
+    sprintf_s(buf, "[MyopicDefocus] %s failed: HR=0x%08X\n", context, hr);
+    LogMsg(buf);
+}
+
+inline void LogInfo(const char* msg) {
+    char buf[512];
+    sprintf_s(buf, "[MyopicDefocus] INFO: %s\n", msg);
+    LogMsg(buf);
+}
+
+inline void LogWin32(const char* context, DWORD err) {
+    char buf[256];
+    sprintf_s(buf, "[MyopicDefocus] %s failed: GetLastError=%lu\n", context, err);
+    LogMsg(buf);
 }

@@ -63,10 +63,11 @@ bool InitD3D(HWND hwnd) {
     scd.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
     scd.SampleDesc.Count = 1;
     scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    scd.BufferCount = 2;
-    scd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+    scd.BufferCount = 1;
+    scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
     scd.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
 
+    // BitBlt (DISCARD) 模型; 分层窗口只与 BitBlt 交换链有明确定义的互操作.
     hr = dxgiFactory->CreateSwapChainForHwnd(g_d3dDevice.Get(), hwnd, &scd, nullptr, nullptr, &g_swapChain);
     if (FAILED(hr)) {
         LogHr("CreateSwapChainForHwnd", hr);

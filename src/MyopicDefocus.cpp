@@ -3,7 +3,6 @@
 #include <dxgi1_2.h>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
-#include <dwmapi.h>
 #include <algorithm>
 #include <cmath>
 #include <chrono>
@@ -12,12 +11,12 @@
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
-#pragma comment(lib, "dwmapi.lib")
 
 #include "config.h"
 #include "config_io.h"
 #include "blur_shader.h"
 #include "optical_model.h"
+#include "log.h"
 
 Config g_config;
 
@@ -39,7 +38,15 @@ void UpdateShaderParams() {
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     if (msg == WM_SIZE) ResizeSwapChain();
-    if (msg == WM_DESTROY) PostQuitMessage(0);
+    if (msg == WM_DESTROY) {
+        UnregisterHotKey(hwnd, 1);
+        PostQuitMessage(0);
+    }
+
+    // Ctrl+Alt+M 全局退出热键 (窗口不激活时也可触发).
+    if (msg == WM_HOTKEY && wParam == 1) {
+        PostQuitMessage(0);
+    }
 
     // 仅保留 Esc 退出.
     // (强度调节 Up/Down 已移除 - 改为运行前通过 JSON 配置)
@@ -83,14 +90,17 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int) {
     }
 
     HWND hwnd = CreateWindowEx(
-        WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW,
+        WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
         L"MyopicOverlay", L"Overlay",
-        WS_POPUP | WS_VISIBLE,
+        WS_POPUP,
         0, 0, w, h,
         nullptr, nullptr, hInstance, nullptr);
 
-    MARGINS margins = { -1 };
-    DwmExtendFrameIntoClientArea(hwnd, &margins);
+    // WS_EX_LAYERED 窗口必须调用 SetLayeredWindowAttributes 或 UpdateLayeredWindow, 否则行为未定义.
+    // 分层窗口不与 FLIP 交换链 / DwmExtendFrameIntoClientArea 混用.
+    if (!SetLayeredWindowAttributes(hwnd, 0, 255, LWA_ALPHA)) {
+        LogWin32("SetLayeredWindowAttributes", GetLastError());
+    }
 
     if (!InitD3D(hwnd)) {
         MessageBox(NULL, L"D3D Init Failed!", L"Error", MB_ICONERROR);
@@ -98,9 +108,31 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int) {
     }
 
     ResizeSwapChain();
-    SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE);
+    if (!SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE)) {
+        LogWin32("SetWindowDisplayAffinity", GetLastError());
+    } else {
+        DWORD affinity = 0;
+        if (GetWindowDisplayAffinity(hwnd, &affinity)) {
+            char buf[160];
+            sprintf_s(buf, "SetWindowDisplayAffinity ok, readback=0x%08lX (WDA_EXCLUDEFROMCAPTURE=0x%08lX)",
+                      affinity, (unsigned long)WDA_EXCLUDEFROMCAPTURE);
+            LogInfo(buf);
+        } else {
+            LogWin32("GetWindowDisplayAffinity", GetLastError());
+        }
+    }
 
     UpdateShaderParams();
+
+    // 首帧渲染完成后再显示, 避免未初始化的内容闪烁.
+    Render();
+    ShowWindow(hwnd, SW_SHOWNOACTIVATE);
+    UpdateWindow(hwnd);
+
+    // Ctrl+Alt+M 全局退出热键; 注册失败不致命 (Esc 仍可兜底退出).
+    if (!RegisterHotKey(hwnd, 1, MOD_CONTROL | MOD_ALT, 'M')) {
+        LogWin32("RegisterHotKey", GetLastError());
+    }
 
     auto next_frame = std::chrono::steady_clock::now();
 
