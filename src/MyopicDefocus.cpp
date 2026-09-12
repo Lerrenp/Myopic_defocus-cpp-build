@@ -18,6 +18,7 @@
 #include "config_io.h"
 #include "blur_shader.h"
 #include "optical_model.h"
+#include "log.h"
 
 Config g_config;
 
@@ -89,8 +90,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int) {
         0, 0, w, h,
         nullptr, nullptr, hInstance, nullptr);
 
-    MARGINS margins = { -1 };
-    DwmExtendFrameIntoClientArea(hwnd, &margins);
+    // WS_EX_LAYERED 窗口必须调用 SetLayeredWindowAttributes 或 UpdateLayeredWindow, 否则行为未定义.
+    // 分层窗口不与 FLIP 交换链 / DwmExtendFrameIntoClientArea 混用.
+    if (!SetLayeredWindowAttributes(hwnd, 0, 255, LWA_ALPHA)) {
+        LogWin32("SetLayeredWindowAttributes", GetLastError());
+    }
 
     if (!InitD3D(hwnd)) {
         MessageBox(NULL, L"D3D Init Failed!", L"Error", MB_ICONERROR);

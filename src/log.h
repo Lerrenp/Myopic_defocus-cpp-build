@@ -23,3 +23,17 @@ inline void LogMsg(const char* msg) {
     OutputDebugStringA(msg);
     fputs(msg, stderr);
 }
+
+inline void LogInfo(const char* msg) {
+    char buf[512];
+    sprintf_s(buf, "[MyopicDefocus] INFO: %s\n", msg);
+    OutputDebugStringA(buf);
+    fputs(buf, stderr);
+}
+
+inline void LogWin32(const char* context, DWORD err) {
+    char buf[256];
+    sprintf_s(buf, "[MyopicDefocus] %s failed: GetLastError=%lu\n", context, err);
+    OutputDebugStringA(buf);
+    fputs(buf, stderr);
+}
