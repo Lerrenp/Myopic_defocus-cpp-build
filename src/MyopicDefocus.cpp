@@ -40,7 +40,15 @@ void UpdateShaderParams() {
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     if (msg == WM_SIZE) ResizeSwapChain();
-    if (msg == WM_DESTROY) PostQuitMessage(0);
+    if (msg == WM_DESTROY) {
+        UnregisterHotKey(hwnd, 1);
+        PostQuitMessage(0);
+    }
+
+    // Ctrl+Alt+M 全局退出热键 (窗口不激活时也可触发).
+    if (msg == WM_HOTKEY && wParam == 1) {
+        PostQuitMessage(0);
+    }
 
     // 仅保留 Esc 退出.
     // (强度调节 Up/Down 已移除 - 改为运行前通过 JSON 配置)
@@ -84,9 +92,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int) {
     }
 
     HWND hwnd = CreateWindowEx(
-        WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW,
+        WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
         L"MyopicOverlay", L"Overlay",
-        WS_POPUP | WS_VISIBLE,
+        WS_POPUP,
         0, 0, w, h,
         nullptr, nullptr, hInstance, nullptr);
 
@@ -117,6 +125,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int) {
     }
 
     UpdateShaderParams();
+
+    // 首帧渲染完成后再显示, 避免未初始化的内容闪烁.
+    Render();
+    ShowWindow(hwnd, SW_SHOWNOACTIVATE);
+    UpdateWindow(hwnd);
+
+    // Ctrl+Alt+M 全局退出热键; 注册失败不致命 (Esc 仍可兜底退出).
+    if (!RegisterHotKey(hwnd, 1, MOD_CONTROL | MOD_ALT, 'M')) {
+        LogWin32("RegisterHotKey", GetLastError());
+    }
 
     auto next_frame = std::chrono::steady_clock::now();
 
