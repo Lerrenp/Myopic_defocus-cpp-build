@@ -92,6 +92,7 @@
     <ClInclude Include="..\src\config.h" />
     <ClInclude Include="..\src\config_io.h" />
     <ClInclude Include="..\src\optical_model.h" />
+    <ClInclude Include="..\src\third_party\nlohmann\json.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\test_optical_model.cpp" />

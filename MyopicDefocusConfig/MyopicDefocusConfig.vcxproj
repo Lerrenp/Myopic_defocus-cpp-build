@@ -91,6 +91,7 @@
     <ClInclude Include="..\src\config.h" />
     <ClInclude Include="..\src\config_io.h" />
     <ClInclude Include="..\src\cli.h" />
+    <ClInclude Include="..\src\third_party\nlohmann\json.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\MyopicDefocusConfig.cpp" />

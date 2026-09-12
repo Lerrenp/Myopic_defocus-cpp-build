@@ -97,6 +97,8 @@
     <ClInclude Include="..\src\capture.h" />
     <ClInclude Include="..\src\optical_model.h" />
     <ClInclude Include="..\src\renderer.h" />
+    <ClInclude Include="..\src\log.h" />
+    <ClInclude Include="..\src\third_party\nlohmann\json.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\MyopicDefocus.cpp" />
